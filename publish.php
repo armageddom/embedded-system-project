@@ -10,9 +10,14 @@ $client_id = "phpMQTT-publisher"; // make sure this is unique for connecting to 
 
 $mqtt = new Bluerhinos\phpMQTT($server, $port, $client_id);
 
-if ($mqtt->connect(true, NULL, $username, $password)) {
-	$mqtt->publish("temperature", "", 0);
-	$mqtt->close();
-} else {
-    echo "Time out!\n";
+$start = time();
+while (1) {
+	$temperature = system("perl temperature.pl");
+	if ($mqtt->connect(true, NULL, $username, $password)) {
+		$mqtt->publish("temperature", "$temperature", 0);
+		$mqtt->close();
+	} else {
+		echo "Time out!\n";
+	}
+	sleep(1);
 }
